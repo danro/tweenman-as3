@@ -1,10 +1,12 @@
-package com.tweenman {
-
-	import flash.display.DisplayObject;
+package com.tweenman
+{
 	import flash.utils.getTimer;
-
-	public class Tween {
-
+	import com.tweenman.props.BaseProp;
+	
+	public class Tween
+	{
+		static const ZERO:Number = 0.001;
+		
 		var id:String;
 		var target:Object;
 		var duration:Number;
@@ -12,83 +14,81 @@ package com.tweenman {
 		var vars:Object;
 		var ease:Function;
 		var props:Object;
-		var children:uint;
-
+		var children:int;
 		var activated:Boolean;
-		var startTime:uint;
-		var initTime:uint;
-		var timeMethod:Function = getTimer;
-		static var ZERO:Number = 0.001;
+		var startTime:int;
+		var initTime:int;
+		var timerMode:Boolean;
+		
+		public function Tween () {}
 
-		public function Tween ($target:Object, $vars:Object, $id:String) {
-			target = $target;
-			vars = $vars;
-			id = $id;
-			children = 0;
-			if (!isNaN(vars.time)) vars.duration = vars.time;
-			duration =  vars.duration;
-			delay = vars.delay;
-			if (isNaN(delay) || delay < 0) delay = 0;
-			if (!isNaN(vars.frames)) {
-				timeMethod = TweenMan.getFrames;
-				duration = int(vars.frames);
-				delay = int(delay);
+		internal function init ($target:Object, $vars:Object, $id:String):void
+		{
+			this.target = $target;
+			this.vars = $vars;
+			this.id = $id;
+			this.children = 0;
+			this.timerMode = true;
+			if (!isNaN(this.vars.time)) this.vars.duration = this.vars.time;
+			this.duration =  this.vars.duration;
+			this.delay = this.vars.delay;
+			if (isNaN(this.delay) || this.delay < 0) this.delay = 0;
+			if (!isNaN(this.vars.frames))
+			{
+				this.timerMode = false;
+				this.duration = int(this.vars.frames);
+				this.delay = int(this.delay);
 			}
-			if (isNaN(duration) || duration <= 0) duration = ZERO;
-			if (vars.ease is String) vars.ease = Easing[vars.ease];
-			ease = vars.ease is Function ? vars.ease : TweenMan.defaultEase;
-			if (vars.easeParams != null) {
-				vars.proxiedEase = ease;
-				ease = easeProxy;
+			if (isNaN(this.duration) || this.duration <= 0) this.duration = ZERO;
+			if (this.vars.ease is String) this.vars.ease = Config.easeShortcuts[this.vars.ease];
+			this.ease = this.vars.ease is Function ? this.vars.ease : TweenMan.defaultEase;
+			if (this.vars.easeParams != null)
+			{
+				this.vars.proxiedEase = this.ease;
+				this.ease = easeProxy;
 			}
-			props = {};
-			initTime = timeMethod();
-			activated = false;
+			this.props = {};
+			this.initTime = this.timerMode ? getTimer() : TweenMan.getFrames();
+			this.activated = false;
 			initProps();
-			if (duration == ZERO && delay == 0) {
-				startTime = 0;
+			if (this.duration == ZERO && this.delay == 0)
+			{
+				this.startTime = 0;
 				render(1, 1);
-			} else {
-				TweenMan.enableRender();
+			}
+			else
+			{
+				TweenMan.addToRender(this);
 			}
 		}
 
-		function render ($t:uint, $f:uint) {
-			var elapsed:Number;
-			if (timeMethod == getTimer) {
-				elapsed = ($t - startTime) / 1000;
-			} else {
-				elapsed = $f - startTime;
-			}
-			if (elapsed > duration) elapsed = duration;
-			var position:Number = ease(elapsed, 0, 1, duration);
-			for each (var prop:BaseProp in props) {
-				prop.update(position);
-			}
-			if (vars.onUpdate != null) vars.onUpdate.apply(null, vars.onUpdateParams);
-			if (elapsed == duration) {
-				complete();
-			}
-		}
-
-		function get active():Boolean {
-			if (activated) {
+		internal function isActive ($t:int, $f:int):Boolean
+		{
+			if (this.activated)
+			{
 				return true;
-			} else {
-				if (timeMethod == getTimer) {
-					if ((timeMethod() - initTime) / 1000 > delay) {
-						activated = true;
-						startTime = initTime + (delay * 1000);
-						if (vars.onStart != null) vars.onStart.apply(null, vars.onStartParams);
-						if (duration == ZERO) startTime -= 1;
+			}
+			else
+			{
+				if (this.timerMode)
+				{
+					if (($t - this.initTime) / 1000 > this.delay)
+					{
+						this.activated = true;
+						this.startTime = this.initTime + (this.delay * 1000);
+						if (this.vars.onStart != null) this.vars.onStart.apply(null, this.vars.onStartParams);
+						if (this.duration == ZERO) this.startTime -= 1;
 						return true;
 					}
-				} else {
-					if (timeMethod() - initTime > delay) {
-						activated = true;
-						startTime = initTime + delay;
-						if (vars.onStart != null) vars.onStart.apply(null, vars.onStartParams);
-						if (duration == ZERO) startTime -= 1;
+				}
+				else
+				{
+					if ($f - this.initTime > this.delay)
+					{
+						this.activated = true;
+						this.startTime = this.initTime + this.delay;
+						if (this.vars.onStart != null) this.vars.onStart.apply(null, this.vars.onStartParams);
+						if (this.duration == ZERO) this.startTime -= 1;
 						return true;
 					}
 				}
@@ -96,66 +96,101 @@ package com.tweenman {
 			return false;
 		}
 
-		function removeProp ($p:String):Boolean {
-			if (props[$p] == null) {
+		internal function render ($t:int, $f:int):void
+		{
+			var elapsed:Number = this.timerMode ? ($t - this.startTime) / 1000 : $f - this.startTime;
+			if (elapsed > this.duration) elapsed = this.duration;
+			var position:Number = this.ease(elapsed, 0, 1, this.duration);
+			for each (var prop:BaseProp in this.props)
+			{
+				prop.update(position);
+			}
+			if (this.vars.onUpdate != null) this.vars.onUpdate.apply(null, this.vars.onUpdateParams);
+			if (elapsed == this.duration)
+			{
+				TweenMan.completeTween(this, this.vars.onComplete, this.vars.onCompleteParams);
+			}
+		}
+
+		internal function removeProp ($p:String):Boolean
+		{
+			if (this.props[$p] == null)
+			{
 				return false;
-			} else {
-				--children;
-				delete props[$p];
+			}
+			else
+			{
+				--this.children;
+				delete this.props[$p];
 				return true;
 			}
 		}
 
-		function typeError ($p, $type) {
+		internal function dispose ():void
+		{
+			this.id = undefined;
+			this.target = undefined;
+			this.duration = undefined;
+			this.delay = undefined;
+			this.vars = undefined;
+			this.ease = undefined;
+			this.props = undefined;
+			this.children = undefined;
+			this.activated = undefined;
+			this.startTime = undefined;
+			this.initTime = undefined;
+			this.timerMode = undefined;
+		}
+
+		public function typeError ($p, $type):void
+		{
 			trace("TweenMan says: target must be type [" + $type + "] to use [" + $p + "]");
 			removeProp($p);
 		}
 
-		function valueError ($p) {
-			trace("TweenMan says: unexpected value given for " + target + "[" + $p + "]");
+		public function valueError ($p):void
+		{
+			trace("TweenMan says: unexpected value given for " + this.target + "[" + $p + "]");
 			removeProp($p);
 		}
 
-		private function complete () {
-			var onComplete:Function = vars.onComplete;
-			var onCompleteParams:Object = vars.onCompleteParams;
-			TweenMan.kill(this);
-			if (onComplete != null) onComplete.apply(null, onCompleteParams);
-		}
-
-		private function initProps() {
+		private function initProps():void
+		{
 			var prop:BaseProp;
 			var p:String;
-			for (p in vars) {
-				if ( InternalProps[p] != null ) {
-					continue;
-				} else {
-					var propClass:Class;
-					if ( VirtualProps[p] != null ) {
-						propClass = VirtualProps[p];
-					} else if ( p == "array" && target is Array ) {
-						propClass = ArrayProp;
-					} else if ( target[p] != null ) {
-						propClass = BaseProp;
-					}
-					if ( propClass != null ) {
-						++children;
-						prop = new propClass as BaseProp;
-						props[p] = prop;
-						prop.id = p;
-						prop.tween = this;
-						prop.target = target;
-						prop.value = vars[p];
-						prop.init();
-					} else {
-						trace("TweenMan says: target [" + target + "] does not contain property [" + p + "]");
-					}
+			for (p in this.vars)
+			{
+				if (Config.internalProps[p] != null) continue;
+				var propClass:Class;
+				if (Config.virtualProps[p] != null)
+				{
+					propClass = Config.virtualProps[p];
+				}
+				else if (this.target[p] != null)
+				{
+					propClass = BaseProp;
+				}
+				if (propClass != null)
+				{
+					++this.children;
+					prop = TweenMan.propertyPool.acquire(propClass);
+					this.props[p] = prop;
+					prop.id = p;
+					prop.tween = this;
+					prop.target = this.target;
+					prop.value = this.vars[p];
+					prop.init();
+				}
+				else
+				{
+					trace("TweenMan says: target [" + this.target + "] does not contain property [" + p + "]");
 				}
 			}
 		}
 
-		private function easeProxy (...$params:Array):Number {
-			return vars.proxiedEase.apply(null, $params.concat(vars.easeParams));
+		private function easeProxy (...$params:Array):Number
+		{
+			return this.vars.proxiedEase.apply(null, $params.concat(this.vars.easeParams));
 		}
 	}
 }

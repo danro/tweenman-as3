@@ -1,24 +1,29 @@
-package com.tweenman {
-
+package com.tweenman.props
+{
 	import flash.display.DisplayObject;
 	import flash.display.BitmapData;
 	import flash.filters.BitmapFilter;
-
-	public class BaseFilterProp extends MultiProp {
-
+	
+	public class BaseFilterProp extends BaseMultiProp
+	{
 		protected var filterClass:Class;
 		protected var initializers:Object;
 
-		override function init () {
+		override public function init ():void
+		{
 			if (!(target is DisplayObject)) return tween.typeError(id, "DisplayObject");
 			if (value == null) value = defaults;
 			propList = [];
 			var p:String;
 			var initList:Object = {};
-			for ( p in value ) {
-				if (defaults[p] != null) {
+			for ( p in value )
+			{
+				if (defaults[p] != null)
+				{
 					propList.push(p);
-				} else if (initializers[p] != null) {
+				}
+				else if (initializers[p] != null)
+				{
 					initList[p] = value[p];
 					delete value[p];
 				}
@@ -27,19 +32,24 @@ package com.tweenman {
 			var filterCount:int = filters.length;
 			var filterFound:Boolean = false;
 			var i:int;
-			for ( i = 0; i < filterCount; i++ ) {
-				if ( filters[i] is filterClass ) {
+			for ( i = 0; i < filterCount; ++i )
+			{
+				if ( filters[i] is filterClass )
+				{
 					current = filters[i];
 					filterFound = true;
 				}
 			}
-			if (!filterFound) {
+			if (!filterFound)
+			{
 				current = new filterClass;
-				for ( p in defaults ) {
+				for ( p in defaults )
+				{
 					current[p] = defaults[p];
 				}
 			}
-			for ( p in initList ) {
+			for ( p in initList )
+			{
 				current[p] = initList[p];
 			}
 			var valueIsArray:Boolean = value is Array;
@@ -47,14 +57,17 @@ package com.tweenman {
 			if (!valueIsObject) return tween.valueError(id);
 			super.init();
 		}
-
-		override function update ($position) {
+		
+		override public function update ($position:Number):void
+		{
 			super.update($position);
 			var filters:Array = target.filters;
 			var filterCount:int = filters.length;
 			var i:int;
-			for ( i = 0; i < filterCount; i++ ) {
-				if ( filters[i] is filterClass ) {
+			for ( i = 0; i < filterCount; ++i )
+			{
+				if ( filters[i] is filterClass )
+				{
 					filters[i] = current as BitmapFilter;
 					target.filters = filters;
 					return;
@@ -63,6 +76,13 @@ package com.tweenman {
 			if (filters == null) filters = [];
 			filters.push(current as BitmapFilter);
 			target.filters = filters;
+		}
+		
+		override public function dispose ():void
+		{
+			super.dispose();
+			this.filterClass = undefined;
+			this.initializers = undefined;
 		}
 	}
 }

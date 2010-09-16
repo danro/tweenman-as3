@@ -1,14 +1,16 @@
-package com.tweenman {
-
+package com.tweenman.props
+{
 	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
-
-	public class RectangleProp extends MultiProp {
-
-		override function init () {
+	
+	public class RectangleProp extends BaseMultiProp
+	{
+		override public function init ():void
+		{
 			if (!(target is DisplayObject)) return tween.typeError(id, "DisplayObject");
 			propList = ["x", "y", "width", "height"];
-			if (!target.scrollRect) {
+			if (!target.scrollRect)
+			{
 				var w:Number = Math.max(1, target.width * ( 1 / target.scaleX ));
 				var h:Number = Math.max(1, target.height * ( 1 / target.scaleY ));			
 				target.scrollRect = new Rectangle( 0, 0, w, h );
@@ -19,7 +21,8 @@ package com.tweenman {
 			super.init();
 		}
 	
-		override function update ($position) {
+		override public function update ($position:Number):void
+		{
 			super.update($position);
 			target.scrollRect = current;
 		}

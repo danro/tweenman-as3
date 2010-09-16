@@ -1,23 +1,23 @@
 ﻿/*
-	Version: 1.7 AS3
+	Version: 2.0 AS3
 	---------------------------------------------------------------------------------
 	TweenMan is a complicated man, and no one understands him but his woman...
 	Initially influenced by Jack Doyle's TweenLite engine, TweenMan is now his own man 
 	attempting to provide extended tweening functionality while remaining fit and slim.
 	
-	Weighing in at approximately 10k compiled, TweenMan does a few things you probably 
+	Weighing in at approximately 12k compiled, TweenMan does a few things you probably 
 	haven't seen other engines do. He can tween the scrollRect property of sprites, 
 	tween to frame labels in movieclips, tween just about every filter's properties 
 	including the color of glows, bevels, etc., and he can accomplish all of this 
 	while using time-based or frame-based animation.
 	
 	For updates and examples, visit: http://www.tweenman.com
-
+	
 	Author: Dan Rogers - dan@danro.net
-
+	
 	Special Thanks:	Jack Doyle for sharing TweenLite (greensock.com)
 					Mario Klingemann for sharing ColorMatrix (quasimondo.com)
-
+	
 	Basic Usage
 	---------------------------------------------------------------------------------
 	import com.tweenman.TweenMan;
@@ -43,13 +43,18 @@
 
 	// see if a tween is active
 	TweenMan.isTweening(target, "color");
+	
+	// remove all tweens
+	TweenMan.removeAll();
+	
+	// remove all tweens (and empty object pools)
+	TweenMan.dispose();
 
 
 	Tween Properties
 	---------------------------------------------------------------------------------
 	time					time or duration of tween in seconds
-	duration				eqivalent to time, duration in seconds
-	frames					frame-based duration, overrides time/duration if set
+	frames					frame-based duration, overrides time duration once set
 	ease					function or string, default is Quartic.easeOut or "easeOutQuart"
 	delay					delay before start, in seconds or frames depending on setting
 	onComplete				callback function gets called when tween finishes
@@ -103,7 +108,7 @@
 
 	TweenMan is Licensed under the MIT License
 	---------------------------------------------------------------------------------
-	Copyright (c) 2008 Dan Rogers
+	Copyright (c) 2010 Dan Rogers
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -124,157 +129,223 @@
 	THE SOFTWARE.
 */
 
-package com.tweenman {
-
+package com.tweenman
+{
 	import flash.events.Event;
-	import flash.display.Sprite;
+	import flash.display.Shape;
 	import flash.utils.Dictionary;
-	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import fl.motion.easing.Quartic;
+	import com.tweenman.props.BaseProp;
+	import com.tweenman.utils.ObjectPool;
+	import com.tweenman.utils.MultiObjectPool;
 
-	public class TweenMan {
-
-		public static var version:String = "1.7 AS3";
-		public static var defaultEase:Function = Quartic.easeOut;
+	public class TweenMan
+	{
+		public static const defaultEase:Function = Quartic.easeOut;
 		
 		static var initialized:Boolean;
-		static var listenTarget:Sprite = new Sprite;
+		static var listenTarget:Shape;
 		static var listenerEnabled:Boolean;
-		static var cleanupTimer:Timer = new Timer(2000);
-		static var tweenDict:Dictionary = new Dictionary();
-		static var frameCount:uint = 0;
-		static var tweenCount:uint = 0;
+		static var tweenDict:Dictionary;
+		static var renderDict:Dictionary;
+		static var frameCount:int;
+		static var tweenCount:int;
+		static var tweenPool:ObjectPool;
+		static var propertyPool:MultiObjectPool;
 		
-		public function TweenMan () {
+		public function TweenMan ()
+		{
 			if (initialized) return;
-			listenTarget.addEventListener(Event.ENTER_FRAME, countFrames);
+			this.initialize();
 			initialized = true;
 		}
 		
-		public static function addTween ($target:Object, $vars:Object) {
+		public static function addTween ($target:Object, $vars:Object):void
+		{
 			if (!initialized) new TweenMan;
-			
-			if ($target == null) {
+			if ($target == null)
+			{
 				trace("TweenMan says: target is null, vars [" + $vars + "]");
 				return;
 			}
-			
-			if (tweenDict[$target] == null ) {
+			if (tweenDict[$target] == null)
+			{
 				tweenDict[$target] = {};
-			} else {
+			}
+			else
+			{
 				var removeParams:Array = [$target];
-				for (var p:String in $vars) {
-					if ( InternalProps[p] != null ) continue;
+				for (var p:String in $vars)
+				{
+					if (Config.internalProps[p] != null) continue;
 					removeParams.push(p);
-					if ( ConflictMap[p] != null ) {
-						removeParams = removeParams.concat(ConflictMap[p]);
-					}
+					if (Config.conflictMap[p] != null) removeParams = removeParams.concat(Config.conflictMap[p]);
 				}
 				removeTweens.apply(null, removeParams);
 			}
 			if (tweenDict[$target] == null) tweenDict[$target] = {};
 			var tweenID:String = "t" + String(++tweenCount);
-			tweenDict[$target][tweenID] = new Tween($target, $vars, tweenID);
+			var tweenObj:Object = tweenDict[$target];
+			var tween:Tween = tweenObj[tweenID] = tweenPool.acquire();
+			tween.init($target, $vars, tweenID);
 		}
 		
-		public static function removeTweens ($target:Object, ...$props:Array) {
-			if ($target == null || tweenDict[$target] == null) return;
-			if ($props.length == 0) {
+		public static function removeTweens ($target:Object, ...$props:Array):void
+		{
+			if (!initialized || $target == null || tweenDict[$target] == null) return;
+			var tween:Tween;
+			if ($props.length == 0)
+			{
+				for each (tween in tweenDict[$target])
+				{
+					kill(tween);
+				}
 				delete tweenDict[$target];
-			} else {
-				var p:String, tween:Tween, removed:Boolean;
-				for each (p in $props) {
-					for each (tween in tweenDict[$target]) {
+			}
+			else
+			{
+				var p:String, prop:BaseProp, removed:Boolean;
+				for each (p in $props)
+				{
+					for each (tween in tweenDict[$target])
+					{
+						prop = tween.props[p];
 						removed = tween.removeProp(p);
-						if (removed && tween.children == 0) kill(tween);
+						if (removed)
+						{
+							prop.dispose();
+							propertyPool.release(prop);
+							if (tween.children == 0) kill(tween);
+						}
 					}
 				}
 			}
 		}
 		
-		public static function removeAll () {
-			tweenDict = new Dictionary();
-			killGarbage();
+		public static function removeAll ():void
+		{
+			if (!initialized) return;
+			disableRender();
 		}
 		
-		public static function isTweening ($target:Object, $prop:String=null):Boolean {
-			killGarbage();
-			if (tweenDict[$target] == null) return false;
+		public static function dispose ():void
+		{
+			if (!initialized) return;
+			removeAll();
+			tweenPool.empty();
+			propertyPool.empty();
+		}
+		
+		public static function isTweening ($target:Object, $prop:String=null):Boolean
+		{
+			if (!initialized || tweenDict[$target] == null) return false;
 			if ($prop == null) return true;
 			var tween:Tween;
-			for each (tween in tweenDict[$target]) {
+			for each (tween in tweenDict[$target])
+			{
 				if (tween.props[$prop] != null) return true;
 			}
 			return false;
 		}
 		
-		public static function killGarbage ($e:Event=null) {
-			var count:uint = 0;
-			var found:Boolean;
-			var targ:Object, tweenID:String;
-			for (targ in tweenDict) {
-				found = false;
-				for (tweenID in tweenDict[targ]) {
+		public static function getPropByClass (propClass:Class):BaseProp
+		{
+			if (!initialized) return null;
+			return propertyPool.acquire(propClass);
+		}
+		
+		static function completeTween ($tween:Tween, $onComplete:Function, $onCompleteParams:Object):void
+		{
+			kill($tween);
+			$tween = null;
+			if ($onComplete != null) $onComplete.apply(null, $onCompleteParams);
+		}
+		
+		static function kill ($tween:Tween):void
+		{
+			var targ:Object = $tween.target;
+			var tweenID:String = $tween.id;
+			delete renderDict[tweenID];
+			if (tweenDict[targ])
+			{
+				delete tweenDict[targ][tweenID];
+				var found:Boolean = false;
+				for each (var tween:Tween in tweenDict[targ])
+				{
 					found = true;
 					break;
 				}
-				if (!found) {
-					delete tweenDict[targ];
-				} else {
-					++count;
-				}
+				if (!found) delete tweenDict[targ];
 			}
-			if (count == 0) {
-				disableRender();
+			for each (var prop:BaseProp in $tween.props)
+			{
+				prop.dispose();
+				propertyPool.release(prop);
 			}
+			$tween.dispose();
+			tweenPool.release($tween);
 		}
 		
-		static function kill ($tween:Tween) {
-			if (tweenDict[$tween.target] == null || tweenDict[$tween.target][$tween.id] == null) return;
-			delete tweenDict[$tween.target][$tween.id];
-		}
-		
-		static function getFrames ():uint {
+		static function getFrames ():int
+		{
 			return frameCount;
 		}
 		
-		static function enableRender () {
-			if (!listenerEnabled) {
-				listenTarget.addEventListener(Event.ENTER_FRAME, render);
-				cleanupTimer.addEventListener("timer", killGarbage);
-	           	cleanupTimer.start();
-				listenerEnabled = true;
-			}
-			render();
-		}
-
-		static function disableRender () {
-			listenTarget.removeEventListener(Event.ENTER_FRAME, render);
-			cleanupTimer.removeEventListener("timer", killGarbage);
-			cleanupTimer.stop();
-			resetCounts();
-			listenerEnabled = false;
+		static function addToRender ($tween:Tween):void
+		{
+			renderDict[$tween.id] = $tween;
+			if (!listenerEnabled) enableRender();
 		}
 		
-		private static function countFrames ($e:Event) {
+		static function enableRender ():void
+		{
+			listenTarget.addEventListener(Event.ENTER_FRAME, render);
+			listenerEnabled = true;
+		}
+
+		static function disableRender ():void
+		{
+			listenTarget.removeEventListener(Event.ENTER_FRAME, render);
+			listenerEnabled = false;
+			resetState();
+		}
+		
+		private static function countFrames ($e:Event):void
+		{
 			++frameCount;
 		}
 		
-		private static function render ($e:Event=null) {
-			var t:uint = getTimer();
-			var f:uint = frameCount;
-			var obj:Object, tween:Tween;
-			for each (obj in tweenDict) {
-				for each (tween in obj) {
-					if (tween.active) tween.render(t,f);
-				}
+		private static function render ($e:Event=null):void
+		{
+			var t:int = getTimer();
+			var f:int = frameCount;
+			var tween:Tween;
+			var found:Boolean = false;
+			for each (tween in renderDict)
+			{
+				if (tween.isActive(t,f)) tween.render(t,f);
+				found = true;
 			}
+			if (!found) disableRender();
 		}
 		
-		private static function resetCounts () {
+		private static function resetState ():void
+		{
+			tweenDict = new Dictionary(true);
+			renderDict = new Dictionary(true);
 			frameCount = 0;
 			tweenCount = 0;
+		}
+		
+		private final function initialize ():void
+		{
+			resetState();
+			listenTarget = new Shape;
+			listenTarget.addEventListener(Event.ENTER_FRAME, countFrames);
+			tweenPool = new ObjectPool(Tween);
+			propertyPool = new MultiObjectPool(Config.virtualProps);
+			propertyPool.add(BaseProp);
 		}
 	}
 }

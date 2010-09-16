@@ -1,12 +1,14 @@
 ﻿/*
-ConstantEase 1.0
-
-Author: Dan Rogers - dan@danro.net
-
-Description: Specialized easing utility to be used instead of TweenMan when
-			 property values must constantly change (e.g. mouse movement).
-
-Usage:
+	ConstantEase 1.4 - Last updated 9/5/2010
+	
+	Author: Dan Rogers - dan@danro.net
+	
+	Description: Specialized easing utility to be used instead of TweenMan when
+				 property values must constantly change (e.g. mouse movement).
+	
+	Usage:
+	---------------------------------------------------------------------------------
+	import com.tweenman.ConstantEase;
 
 	// basic init
 	var myEase = new ConstantEase(target);
@@ -17,8 +19,8 @@ Usage:
 	// set or update properties
 	myEase.setProperties({ x: 200, y: 100, alpha: 0.5 });
 
-Ease Options:
-
+	Ease Options:
+	---------------------------------------------------------------------------------
 	common:
 		maxVelocity		(default: 0)	limit the maximum velocity of an ease
 		sleepThreshold	(default: 0 regular, 3 elastic) number of frames to wait before sleeping
@@ -29,16 +31,16 @@ Ease Options:
  	elastic:
 		easeKinetic		(default: 0.3)	amount of kinetic
 		easeDamp		(default: 0.7)	amount of dampening
-
 */
 
-package com.tweenman {
-
-	import flash.display.Sprite;
+package com.tweenman
+{
+	import flash.display.Shape;
 	import flash.events.Event;
+	import flash.utils.Dictionary;
 
-	public class ConstantEase {
-	
+	public class ConstantEase
+	{
 		// ease types
 		public static var REGULAR:String = "regular";
 		public static var ELASTIC:String = "elastic";
@@ -49,16 +51,18 @@ package com.tweenman {
 	
 		// properties
 		private var targ:*;
-		private var sprite:Sprite;
-		private var easeList:Object = {};
+		private var listenTarget:Shape;
+		private var easeList:Dictionary = new Dictionary;
 		private var active:Boolean;
 		private var easeClass:Class;
 		private var easeOptions:Object;
 
 		// constructor
-		public function ConstantEase ($targ:*, $type:String=null, $options:Object=null) {
+		public function ConstantEase ($targ:*, $type:String=null, $options:Object=null)
+		{
 			targ = $targ;
-			switch($type) {
+			switch($type)
+			{
 				case ELASTIC: 
 					easeClass = ElasticEase; break;
 				case REGULAR: 
@@ -68,20 +72,27 @@ package com.tweenman {
 			setOptions($options);
 		}
 
-		public function setOptions ($options:Object) {
+		public function setOptions ($options:Object):void
+		{
 			easeOptions = $options;
-			for each (var ease in easeList) {
+			for each (var ease in easeList)
+			{
 				ease.setProps(easeOptions);
 			}
 		}
 
-		public function setProperties ($newProps:Object) {
+		public function setProperties ($newProps:Object):void
+		{
 			var propsChanged:Boolean = false;
-			for (var p:String in $newProps) {
-				if (easeList[p] == null) {
+			for (var p:String in $newProps)
+			{
+				if (easeList[p] == null)
+				{
 					easeList[p] = new easeClass(targ, p, $newProps[p], easeOptions);
 					propsChanged = true;
-				} else if (easeList[p].finish != $newProps[p] || targ[p] != $newProps[p]) {
+				}
+				else if (easeList[p].finish != $newProps[p] || targ[p] != $newProps[p])
+				{
 					easeList[p].finish = $newProps[p];
 					easeList[p].reset();
 					propsChanged = true;
@@ -90,40 +101,50 @@ package com.tweenman {
 			if (propsChanged) enable();
 		}
 	
-		public function getVelocity ($prop:String):Number {
+		public function getVelocity ($prop:String):Number
+		{
 			return easeList[$prop].velocity;
 		}
 	
-		public function isActive ():Boolean {
+		public function isActive ():Boolean
+		{
 			return active;
 		}
 	
-		public function enable () {
-			if (!active) {
-				if (sprite == null) sprite = new Sprite;
+		public function enable ():void
+		{
+			if (!active)
+			{
+				if (listenTarget == null) listenTarget = new Shape;
+				listenTarget.addEventListener(Event.ENTER_FRAME, update);
 				active = true;
-				sprite.addEventListener(Event.ENTER_FRAME, update, false, 0, true);
 			}
 		}
 	
-		public function disable () {
-			if (sprite != null) {
-				sprite.removeEventListener(Event.ENTER_FRAME, update);
+		public function disable ():void
+		{
+			if (listenTarget != null)
+			{
+				listenTarget.removeEventListener(Event.ENTER_FRAME, update);
 				active = false;	
 			}
 		}
 	
-		private function update ($e:Event=null) {
+		private function update ($e:Event=null):void
+		{
 			var allSleeping:Boolean = true;
 			
-			for each (var ease in easeList) {
-				if (!ease.sleeping) {
+			for each (var ease in easeList)
+			{
+				if (!ease.sleeping)
+				{
 					ease.update();
 					allSleeping = false;
 				}
 			}
 			if (onUpdate != null) onUpdate();
-			if (allSleeping) {
+			if (allSleeping)
+			{
 				disable();
 				if (onComplete != null) onComplete();
 			}
@@ -134,7 +155,7 @@ package com.tweenman {
 internal class RegularEase {
 
 	// options
-	public var sleepThreshold:uint;
+	public var sleepThreshold:int;
 	public var maxVelocity:Number;
 	public var easeAmount:Number;
 	public var easeKinetic:Number;
@@ -144,12 +165,13 @@ internal class RegularEase {
 	public var targ:*;
 	public var prop:String;
 	public var finish:Number;
-	public var sleepCount:uint;
+	public var sleepCount:int;
 	public var velocity:Number;
 	public var lastValue:Number;
 	public var sleeping:Boolean;
 
-	public function RegularEase ($targ:*, $prop:String, $finish:Number, $options:Object) {
+	public function RegularEase ($targ:*, $prop:String, $finish:Number, $options:Object)
+	{
 		targ = $targ;
 		prop = $prop;
 		finish = $finish;
@@ -158,35 +180,42 @@ internal class RegularEase {
 		reset();
 	}
 
-	public function construct () {
+	public function construct ():void
+	{
 		sleepThreshold = 0;
 		maxVelocity = 0;
 		easeAmount = 0.3;
 	}
 
-	public function setProps ($props:Object) {
+	public function setProps ($props:Object):void
+	{
 		for (var i:String in $props) this[i] = $props[i];
 	}
 
-	public function reset () {
+	public function reset ():void
+	{
 		sleepCount = 0;
 		sleeping = false;
 	}
 
-	public function getNext ():Number {
+	public function getNext ():Number
+	{
 		var diff:Number = finish - targ[prop];
 		velocity = diff * easeAmount;
-		if (maxVelocity > 0) {
+		if (maxVelocity > 0)
+		{
 			if (velocity < -maxVelocity) velocity = -maxVelocity;
 			if (velocity > maxVelocity) velocity = maxVelocity;
 		}
 		return targ[prop] + velocity;
 	}
 
-	public function update () {
+	public function update ():void
+	{
 		targ[prop] = getNext();
 		if (lastValue == targ[prop]) sleepCount++;
-		if (sleepCount > sleepThreshold) {
+		if (sleepCount > sleepThreshold)
+		{
 			targ[prop] = finish;
 			sleeping = true;
 		}
@@ -196,11 +225,13 @@ internal class RegularEase {
 
 internal class ElasticEase extends RegularEase {
 
-	public function ElasticEase ($targ:*, $prop:String, $finish:Number, $options:Object) {
+	public function ElasticEase ($targ:*, $prop:String, $finish:Number, $options:Object)
+	{
 		super($targ, $prop, $finish, $options);
 	}
 
-	public override function construct () {
+	public override function construct ():void
+	{
 		sleepThreshold = 3;
 		maxVelocity = 0;
 		easeAmount = 0.3;
@@ -209,10 +240,12 @@ internal class ElasticEase extends RegularEase {
 		velocity = 0;
 	}
 
-	public override function getNext ():Number {
+	public override function getNext ():Number
+	{
 		velocity += (finish - targ[prop]) * easeKinetic;
 		velocity *= easeDamp;
-		if (maxVelocity > 0) {
+		if (maxVelocity > 0)
+		{
 			if (velocity < -maxVelocity) velocity = -maxVelocity;
 			if (velocity > maxVelocity) velocity = maxVelocity;
 		}

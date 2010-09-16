@@ -1,5 +1,5 @@
-package com.tweenman {
-		
+package com.tweenman.props
+{		
 	import flash.media.Microphone;
 	import flash.net.NetStream;
 	import flash.display.SimpleButton;
@@ -8,12 +8,13 @@ package com.tweenman {
 	import flash.display.Sprite;
 	import flash.media.SoundTransform;
 
-	public class SoundProp extends BaseProp {
-
+	public class SoundProp extends BaseProp
+	{
 		private static var types = [ Microphone, NetStream, SimpleButton, SoundChannel, Sprite ];
 		private var previous:Object;
 
-		override function init () {
+		override public function init ():void
+		{
 			var typeFound:Boolean = false;
 			if (target == SoundMixer) {
 				typeFound = true;
@@ -29,10 +30,17 @@ package com.tweenman {
 			super.init();
 		}
 
-		override function update ($position) {
+		override public function update ($position:Number):void
+		{
 			target = previous.soundTransform;
 			super.update($position);
 			previous.soundTransform = target;
+		}
+		
+		override public function dispose ():void
+		{
+			super.dispose();
+			this.previous = undefined;
 		}
 	}
 }

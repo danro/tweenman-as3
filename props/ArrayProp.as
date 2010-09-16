@@ -1,12 +1,16 @@
-package com.tweenman {
+package com.tweenman.props
+{	
+	import com.tweenman.TweenMan;
 	
-	public class ArrayProp extends BaseProp {
-
+	public class ArrayProp extends BaseProp
+	{
 		protected var props:Object = {};
 		protected var current:Array;
 
-		override function init () {
-			if (current == null) {
+		override public function init ():void
+		{
+			if (current == null)
+			{
 				if (target is Array) {
 					current = target;
 				} else if (target[id] is Array) {
@@ -17,8 +21,9 @@ package com.tweenman {
 			if (!valueIsArray) return tween.valueError(id);
 			var count:int = current.length;
 			var i:int, prop:BaseProp;
-			for ( i = 0; i < count; i++ ) {
-				prop = new BaseProp;
+			for (i = 0; i < count; ++i)
+			{
+				prop = TweenMan.getPropByClass(BaseProp);
 				props[ String(i) ] = prop;
 				prop.id = i;
 				prop.value = value[i];
@@ -26,12 +31,21 @@ package com.tweenman {
 				prop.init();
 			}
 		}
-
-		override function update ($position) {
+		
+		override public function update ($position:Number):void
+		{
 			var prop:BaseProp;
-			for each (prop in props) {
+			for each (prop in props)
+			{
 				prop.update($position);
 			}
+		}
+		
+		override public function dispose ():void
+		{
+			super.dispose();
+			this.props = {};
+			this.current = undefined;
 		}
 	}
 }
