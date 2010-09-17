@@ -1,4 +1,4 @@
-	package com.tweenman
+`package com.tweenman`
 
 TweenMan AS3 ActionScript tweening library
 ==========================================
