@@ -1,7 +1,7 @@
 	package com.tweenman
 
 TweenMan AS3 ActionScript tweening library
-======================================
+==========================================
 
 * [Documentation](http://github.com/danro/tweenman-as3/wiki)
 
