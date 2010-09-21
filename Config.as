@@ -1,11 +1,10 @@
 package com.tweenman
 {
-	import fl.motion.easing.*;
 	import com.tweenman.props.*;
 	
 	public class Config
 	{
-		static const virtualProps = {
+		internal static const virtualProps:Object = {
 			visible: 				VisibleProp,
 			frame: 					FrameProp,
 			scale: 					ScaleProp,
@@ -28,7 +27,7 @@ package com.tweenman
 			array: 					ArrayProp
 		};
 		
-		static const conflictMap = {
+		internal static const conflictMap:Object = {
 			visible: 				["alpha", "color"],
 			alpha: 					["visible", "color"],
 			color: 					["visible", "alpha"],
@@ -37,7 +36,7 @@ package com.tweenman
 			scaleY: 				"scale"
 		};
 				
-		static const internalProps = {
+		internal static const internalProps:Object = {
 			time: 					true,
 			duration: 				true,
 			frames: 				true,
@@ -51,52 +50,6 @@ package com.tweenman
 			onStartParams: 			true,
 			easeParams: 			true,
 			proxiedEase: 			true
-		};
-		
-		static const easeShortcuts = {
-			easeLinear: 			Linear.easeNone,
-			linear: 				Linear.easeNone,
-			none: 					Linear.easeNone,
-
-			easeOutSine: 			Sine.easeOut,
-			easeInSine: 			Sine.easeIn,
-			easeInOutSine: 			Sine.easeInOut,
-
-			easeOutQuint: 			Quintic.easeOut,
-			easeInQuint: 			Quintic.easeIn,
-			easeInOutQuint: 		Quintic.easeInOut,
-	
-			easeOutQuart: 			Quartic.easeOut,
-			easeInQuart: 			Quartic.easeIn,
-			easeInOutQuart: 		Quartic.easeInOut,
-	
-			easeOutQuad: 			Quadratic.easeOut,
-			easeInQuad: 			Quadratic.easeIn,
-			easeInOutQuad: 			Quadratic.easeInOut,
-	
-			easeOutExpo: 			Exponential.easeOut,
-			easeInExpo: 			Exponential.easeIn,
-			easeInOutExpo: 			Exponential.easeInOut,
-
-			easeOutElastic: 		Elastic.easeOut,
-			easeInElastic: 			Elastic.easeIn,
-			easeInOutElastic: 		Elastic.easeInOut,
-	
-			easeOutCircular: 		Circular.easeOut,
-			easeInCircular: 		Circular.easeIn,
-			easeInOutCircular: 		Circular.easeInOut,
-	
-			easeOutBack: 			Back.easeOut,
-			easeInBack: 			Back.easeIn,
-			easeInOutBack: 			Back.easeInOut,
-	
-			easeOutBounce: 			Bounce.easeOut,
-			easeInBounce: 			Bounce.easeIn,
-			easeInOutBounce: 		Bounce.easeInOut,
-	
-			easeOutCubic: 			Cubic.easeOut,
-			easeInCubic: 			Cubic.easeIn,
-			easeInOutCubic: 		Cubic.easeInOut
 		};
 	}
 }

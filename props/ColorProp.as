@@ -7,7 +7,7 @@ package com.tweenman.props
 	{
 		override public function init ():void
 		{
-			if (!(target is DisplayObject)) return tween.typeError(id, "DisplayObject");
+			if (!(target is DisplayObject)) { tween.typeError(id, "DisplayObject"); return; }
 			var defaults:Object = { redMultiplier: 1.0, greenMultiplier: 1.0, blueMultiplier: 1.0, alphaMultiplier: 1.0, 
 						 redOffset: 0, greenOffset: 0, blueOffset: 0, alphaOffset: 0, brightness: 0,
 						 tintColor: 0x000000, tintMultiplier: 0, burn: 0 };

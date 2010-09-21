@@ -10,7 +10,7 @@ package com.tweenman.props
 
 	public class SoundProp extends BaseProp
 	{
-		private static var types = [ Microphone, NetStream, SimpleButton, SoundChannel, Sprite ];
+		private static var types:Array = [ Microphone, NetStream, SimpleButton, SoundChannel, Sprite ];
 		private var previous:Object;
 
 		override public function init ():void
@@ -23,7 +23,7 @@ package com.tweenman.props
 					if (target is soundType) { typeFound = true; break; }
 				}
 			}
-			if (!typeFound) return tween.typeError(id, "Microphone, NetStream, SimpleButton, SoundChannel, SoundMixer, Sprite");
+			if (!typeFound) { tween.typeError(id, "Microphone, NetStream, SimpleButton, SoundChannel, SoundMixer, Sprite"); return; }
 			if (target.soundTransform == null) target.soundTransform = new SoundTransform;
 			previous = target;
 			target = target.soundTransform;

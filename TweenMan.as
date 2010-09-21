@@ -1,5 +1,5 @@
 ﻿/*
-	Version: 2.0 AS3
+	Version: 2.1 AS3
 	---------------------------------------------------------------------------------
 	TweenMan is a complicated man, and no one understands him but his woman...
 	Initially influenced by Jack Doyle's TweenLite engine, TweenMan is now his own man 
@@ -55,7 +55,7 @@
 	---------------------------------------------------------------------------------
 	time					time or duration of tween in seconds
 	frames					frame-based duration, overrides time duration once set
-	ease					function or string, default is Quartic.easeOut or "easeOutQuart"
+	ease					function or string, default is "easeOutQuart"
 	delay					delay before start, in seconds or frames depending on setting
 	onComplete				callback function gets called when tween finishes
 	onCompleteParams		params for onComplete function
@@ -135,24 +135,23 @@ package com.tweenman
 	import flash.display.Shape;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
-	import fl.motion.easing.Quartic;
 	import com.tweenman.props.BaseProp;
 	import com.tweenman.utils.ObjectPool;
 	import com.tweenman.utils.MultiObjectPool;
 
 	public class TweenMan
 	{
-		public static const defaultEase:Function = Quartic.easeOut;
+		public static const defaultEase:Function = Easing.easeOutQuart;
 		
-		static var initialized:Boolean;
-		static var listenTarget:Shape;
-		static var listenerEnabled:Boolean;
-		static var tweenDict:Dictionary;
-		static var renderDict:Dictionary;
-		static var frameCount:int;
-		static var tweenCount:int;
-		static var tweenPool:ObjectPool;
-		static var propertyPool:MultiObjectPool;
+		internal static var initialized:Boolean;
+		internal static var listenTarget:Shape;
+		internal static var listenerEnabled:Boolean;
+		internal static var tweenDict:Dictionary;
+		internal static var renderDict:Dictionary;
+		internal static var frameCount:int;
+		internal static var tweenCount:int;
+		internal static var tweenPool:ObjectPool;
+		internal static var propertyPool:MultiObjectPool;
 		
 		public function TweenMan ()
 		{
@@ -255,14 +254,14 @@ package com.tweenman
 			return propertyPool.acquire(propClass);
 		}
 		
-		static function completeTween ($tween:Tween, $onComplete:Function, $onCompleteParams:Object):void
+		internal static function completeTween ($tween:Tween, $onComplete:Function, $onCompleteParams:Object):void
 		{
 			kill($tween);
 			$tween = null;
 			if ($onComplete != null) $onComplete.apply(null, $onCompleteParams);
 		}
 		
-		static function kill ($tween:Tween):void
+		internal static function kill ($tween:Tween):void
 		{
 			var targ:Object = $tween.target;
 			var tweenID:String = $tween.id;
@@ -271,7 +270,8 @@ package com.tweenman
 			{
 				delete tweenDict[targ][tweenID];
 				var found:Boolean = false;
-				for each (var tween:Tween in tweenDict[targ])
+				var tween:Tween;
+				for each (tween in tweenDict[targ])
 				{
 					found = true;
 					break;
@@ -287,24 +287,24 @@ package com.tweenman
 			tweenPool.release($tween);
 		}
 		
-		static function getFrames ():int
+		internal static function getFrames ():int
 		{
 			return frameCount;
 		}
 		
-		static function addToRender ($tween:Tween):void
+		internal static function addToRender ($tween:Tween):void
 		{
 			renderDict[$tween.id] = $tween;
 			if (!listenerEnabled) enableRender();
 		}
 		
-		static function enableRender ():void
+		internal static function enableRender ():void
 		{
 			listenTarget.addEventListener(Event.ENTER_FRAME, render);
 			listenerEnabled = true;
 		}
 
-		static function disableRender ():void
+		internal static function disableRender ():void
 		{
 			listenTarget.removeEventListener(Event.ENTER_FRAME, render);
 			listenerEnabled = false;
@@ -338,7 +338,7 @@ package com.tweenman
 			tweenCount = 0;
 		}
 		
-		private final function initialize ():void
+		private function initialize ():void
 		{
 			resetState();
 			listenTarget = new Shape;

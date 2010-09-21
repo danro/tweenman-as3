@@ -1,7 +1,6 @@
 package com.tweenman.props
 {
 	import flash.display.DisplayObject;
-	import flash.display.BitmapData;
 	import flash.filters.BitmapFilter;
 	
 	public class BaseFilterProp extends BaseMultiProp
@@ -11,7 +10,7 @@ package com.tweenman.props
 
 		override public function init ():void
 		{
-			if (!(target is DisplayObject)) return tween.typeError(id, "DisplayObject");
+			if (!(target is DisplayObject)) { tween.typeError(id, "DisplayObject"); return; }
 			if (value == null) value = defaults;
 			propList = [];
 			var p:String;
@@ -54,7 +53,7 @@ package com.tweenman.props
 			}
 			var valueIsArray:Boolean = value is Array;
 			var valueIsObject:Boolean = typeof value == "object" && !valueIsArray;
-			if (!valueIsObject) return tween.valueError(id);
+			if (!valueIsObject) { tween.valueError(id); return; }
 			super.init();
 		}
 		

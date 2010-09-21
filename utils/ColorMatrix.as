@@ -5,11 +5,11 @@ package com.tweenman.utils
 		public var matrix:Array;
 		public static const IDENTITY:Array = [1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0];
 		
-		static const NEG_INF:Number = Number.NEGATIVE_INFINITY;
-		static const MATH_PI_180:Number = 0.017453294444444;
-		static const r_lum:Number = 0.212671;
-		static const g_lum:Number = 0.715160;
-		static const b_lum:Number = 0.072169;
+		private static const NEG_INF:Number = Number.NEGATIVE_INFINITY;
+		private static const MATH_PI_180:Number = Math.PI/180;
+		private static const r_lum:Number = 0.212671;
+		private static const g_lum:Number = 0.715160;
+		private static const b_lum:Number = 0.072169;
 
 		public function ColorMatrix ()
 		{

@@ -3,7 +3,7 @@
 TweenMan AS3 ActionScript tweening library
 ==========================================
 
-	Version: 2.0 AS3
+	Version: 2.1 AS3
 	---------------------------------------------------------------------------------
 	TweenMan is a complicated man, and no one understands him but his woman...
 	Initially influenced by Jack Doyle's TweenLite engine, TweenMan is now his own man 

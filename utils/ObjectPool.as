@@ -2,9 +2,9 @@ package com.tweenman.utils
 {
 	public class ObjectPool
 	{
-		var Reusable:Class;
-		var length:int = 0;
-		var list:Array = [];
+		private var Reusable:Class;
+		private var length:int = 0;
+		private var list:Array = [];
 		
 		public function ObjectPool (Reusable:Class)
 		{

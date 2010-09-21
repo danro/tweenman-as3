@@ -4,7 +4,7 @@ package com.tweenman.utils
 	
 	public class MultiObjectPool
 	{
-		var pools:Dictionary;
+		private var pools:Dictionary;
 		
 		public function MultiObjectPool (reusables:Object)
 		{

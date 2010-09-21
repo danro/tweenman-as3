@@ -18,7 +18,7 @@ package com.tweenman.props
 				}
 			}
 			var valueIsArray:Boolean = value is Array;
-			if (!valueIsArray) return tween.valueError(id);
+			if (!valueIsArray) { tween.valueError(id); return; }
 			var count:int = current.length;
 			var i:int, prop:BaseProp;
 			for (i = 0; i < count; ++i)

@@ -7,7 +7,7 @@ package com.tweenman.props
 	{
 		override public function init ():void
 		{
-			if (!(target is MovieClip)) return tween.typeError(id, "MovieClip");
+			if (!(target is MovieClip)) { tween.typeError(id, "MovieClip"); return; }
 			start = target.currentFrame;
 			if (typeof(value) == "number")
 			{

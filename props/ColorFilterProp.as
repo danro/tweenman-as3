@@ -11,7 +11,7 @@ package com.tweenman.props
 		
 		override public function init ():void
 		{
-			if (!(target is DisplayObject)) return tween.typeError(id, "DisplayObject");
+			if (!(target is DisplayObject)) { tween.typeError(id, "DisplayObject"); return; }
 			if (value == null) value = defaults;
 			var cmf:ColorMatrixFilter;
 			var filters:Array = target.filters;

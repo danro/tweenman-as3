@@ -5,20 +5,20 @@ package com.tweenman
 	
 	public class Tween
 	{
-		static const ZERO:Number = 0.001;
+		internal static const ZERO:Number = 0.001;
 		
-		var id:String;
-		var target:Object;
-		var duration:Number;
-		var delay:Number;
-		var vars:Object;
-		var ease:Function;
-		var props:Object;
-		var children:int;
-		var activated:Boolean;
-		var startTime:int;
-		var initTime:int;
-		var timerMode:Boolean;
+		internal var id:String;
+		internal var target:Object;
+		internal var duration:Number;
+		internal var delay:Number;
+		internal var vars:Object;
+		internal var ease:Function;
+		internal var props:Object;
+		internal var children:int;
+		internal var activated:Boolean;
+		internal var startTime:int;
+		internal var initTime:int;
+		internal var timerMode:Boolean;
 		
 		public function Tween () {}
 
@@ -40,7 +40,7 @@ package com.tweenman
 				this.delay = int(this.delay);
 			}
 			if (isNaN(this.duration) || this.duration <= 0) this.duration = ZERO;
-			if (this.vars.ease is String) this.vars.ease = Config.easeShortcuts[this.vars.ease];
+			if (this.vars.ease is String) this.vars.ease = Easing[this.vars.ease];
 			this.ease = this.vars.ease is Function ? this.vars.ease : TweenMan.defaultEase;
 			if (this.vars.easeParams != null)
 			{
@@ -142,16 +142,16 @@ package com.tweenman
 			this.timerMode = undefined;
 		}
 
-		public function typeError ($p, $type):void
+		public function typeError ($p:Object, $type:String):void
 		{
 			trace("TweenMan says: target must be type [" + $type + "] to use [" + $p + "]");
-			removeProp($p);
+			removeProp(String($p));
 		}
 
-		public function valueError ($p):void
+		public function valueError ($p:Object):void
 		{
 			trace("TweenMan says: unexpected value given for " + this.target + "[" + $p + "]");
-			removeProp($p);
+			removeProp(String($p));
 		}
 
 		private function initProps():void
