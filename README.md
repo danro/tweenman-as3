@@ -33,7 +33,7 @@ TweenMan AS3 ActionScript tweening library
 	TweenMan.addTween(target, { frames: 50, rectangle: [0,0,100,100], ease: "easeOutBack" });
 
 	// time-based ColorMatrixFilter tween
-	TweenMan.addTween(target, { time: 2, colormatrix: { saturation: 0, contrast: 2 } });
+	TweenMan.addTween(target, { time: 2, colorMatrix: { saturation: 0, contrast: 2 } });
 
 	// tween an array
 	var myArray:Array = [1, 4, 5, 6];
@@ -86,7 +86,7 @@ TweenMan AS3 ActionScript tweening library
 	volume			number					volume using the soundTransform property
 	pan				number					pan using the soundTransform property
 	
-	colormatrix		object					ColorMatrixFilter
+	colorMatrix		object					ColorMatrixFilter
 	  { brightness: 0, contrast: 0, saturation: 1, hue: 0, colorize: 0x000000, 
 		colorizeAmount: 0, blend: false } // set blend for additive blending
 	
@@ -103,7 +103,7 @@ TweenMan AS3 ActionScript tweening library
 	displace		object					DisplacementMapFilter
 	  { scaleX: 0.0, scaleY: 0.0, color: 0, alpha: 0.0 }
 	
-	dropshadow		object					DropShadowFilter
+	dropShadow		object					DropShadowFilter
 	  { distance: 0.0, angle: 45, color: 0, alpha: 1.0, blurX: 0.0, blurY: 0.0, strength: 0 }
 	
 	glow			object					GlowFilter
