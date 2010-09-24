@@ -70,40 +70,46 @@
 	Virtual Properties  
 	  { prop: value } indicates tweenable sub-properties and default values
 	---------------------------------------------------------------------------------
-	visible			number or boolean		same as alpha but toggles visibility
-	frame			number or string		frame number or frame label of a MovieClip
-	scale			number					scaleX and scaleY properties combined
-	color			object					transform a DisplayObject using Color
+	visible				number or boolean		same as alpha but toggles visibility
+	frame				number or string		frame number or frame label of a MovieClip
+	scale				number					scaleX and scaleY properties combined
+	color				object					transform a DisplayObject using Color
 	  { redMultiplier: 1.0, greenMultiplier: 1.0, blueMultiplier: 1.0, alphaMultiplier: 1.0, 
 		redOffset: 0, greenOffset: 0, blueOffset: 0, alphaOffset: 0, brightness: 0,
 		tintColor: 0x000000, tintMultiplier: 0, burn: 0 }
 	
-	rectangle		[0,0,100,100]			scrollRect property of a DisplayObject
-	volume			number					volume using the soundTransform property
-	pan				number					pan using the soundTransform property
+	rectangle			[0,0,100,100]			scrollRect property of a DisplayObject
+	volume				number					volume using the soundTransform property
+	pan					number					pan using the soundTransform property
 	
-	colorMatrix		object					ColorMatrixFilter
+	colorMatrix			object					ColorMatrixFilter
 	  { brightness: 0, contrast: 0, saturation: 1, hue: 0, colorize: 0x000000, 
 		colorizeAmount: 0, blend: false } // set blend for additive blending
 	
-	bevel			object					BevelFilter
+	bevel				object					BevelFilter
 	  { distance: 4.0,  angle: 45, highlightColor: 0xFFFFFF, highlightAlpha: 1.0, 
 		 shadowColor: 0x000000, shadowAlpha: 1.0, blurX: 4.0, blurY: 4.0, strength: 0 }
 	
-	blur			object					BlurFilter
+	blur				object					BlurFilter
 	  { blurX: 0.0, blurY: 0.0 }
 	
-	convolution		object					ConvolutionFilter
+	convolution			object					ConvolutionFilter
 	  { divisor: 1.0, bias: 0.0, color: 0, alpha: 0.0 }
 	
-	displace		object					DisplacementMapFilter
+	displace			object					DisplacementMapFilter
 	  { scaleX: 0.0, scaleY: 0.0, color: 0, alpha: 0.0 }
 	
-	dropShadow		object					DropShadowFilter
+	dropShadow			object					DropShadowFilter
 	  { distance: 0.0, angle: 45, color: 0, alpha: 1.0, blurX: 0.0, blurY: 0.0, strength: 0 }
 	
-	glow			object					GlowFilter
+	glow				object					GlowFilter
 	  { alpha: 1, blurX: 0.0, blurY: 0.0, strength: 0, color: 0 }
+	
+	hexColor			number					generic interpolated hex color value
+	backgroundColor		number					TextField.backgroundColor as hex value
+	borderColor			number					TextField.borderColor as hex value
+	textColor			number					TextField.textColor as hex value
+	text				string					simple text tween for TextField
 
 
 	TweenMan is Licensed under the MIT License
