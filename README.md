@@ -3,7 +3,7 @@
 TweenMan AS3 ActionScript tweening library
 ==========================================
 
-	Version: 2.1 AS3
+	Version: 2.2 AS3
 	---------------------------------------------------------------------------------
 	TweenMan is a complicated man, and no one understands him but his woman...
 	Initially influenced by Jack Doyle's TweenLite engine, TweenMan is now his own man 
@@ -19,8 +19,9 @@ TweenMan AS3 ActionScript tweening library
 	
 	Author: Dan Rogers - dan@danro.net
 	
-	Special Thanks:	Jack Doyle for sharing TweenLite (greensock.com)
-					Mario Klingemann for sharing ColorMatrix (quasimondo.com)
+	Special Thanks:	Jack Doyle (greensock.com)
+					Mario Klingemann (quasimondo.com)
+					Robert Penner (robertpenner.com)
 	
 	Basic Usage
 	---------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ TweenMan AS3 ActionScript tweening library
 	---------------------------------------------------------------------------------
 	time					time or duration of tween in seconds
 	frames					frame-based duration, overrides time duration once set
-	ease					function or string, default is Quartic.easeOut or "easeOutQuart"
+	ease					function or string, default is "easeOutQuart"
 	delay					delay before start, in seconds or frames depending on setting
 	onComplete				callback function gets called when tween finishes
 	onCompleteParams		params for onComplete function
@@ -71,49 +72,50 @@ TweenMan AS3 ActionScript tweening library
 	array					if the target is an array, this property sets the end values
 
 
-	Virtual Properties  
+	Virtual Properties
+	[property]			[type]					[description]
 	  { prop: value } indicates tweenable sub-properties and default values
 	---------------------------------------------------------------------------------
-	visible				number or boolean		same as alpha but toggles visibility
-	frame				number or string		frame number or frame label of a MovieClip
-	scale				number					scaleX and scaleY properties combined
-	color				object					transform a DisplayObject using Color
+	visible				Number or Boolean		same as alpha but toggles visibility
+	frame				Number or String		frame number or frame label of a MovieClip
+	scale				Number					scaleX and scaleY properties combined
+	color				Object					transform a DisplayObject using Color
 	  { redMultiplier: 1.0, greenMultiplier: 1.0, blueMultiplier: 1.0, alphaMultiplier: 1.0, 
 		redOffset: 0, greenOffset: 0, blueOffset: 0, alphaOffset: 0, brightness: 0,
 		tintColor: 0x000000, tintMultiplier: 0, burn: 0 }
 	
 	rectangle			[0,0,100,100]			scrollRect property of a DisplayObject
-	volume				number					volume using the soundTransform property
-	pan					number					pan using the soundTransform property
+	volume				Number					volume using the soundTransform property
+	pan					Number					pan using the soundTransform property
 	
-	colorMatrix			object					ColorMatrixFilter
+	colorMatrix			Object					ColorMatrixFilter
 	  { brightness: 0, contrast: 0, saturation: 1, hue: 0, colorize: 0x000000, 
 		colorizeAmount: 0, blend: false } // set blend for additive blending
 	
-	bevel				object					BevelFilter
+	bevel				Object					BevelFilter
 	  { distance: 4.0,  angle: 45, highlightColor: 0xFFFFFF, highlightAlpha: 1.0, 
-		 shadowColor: 0x000000, shadowAlpha: 1.0, blurX: 4.0, blurY: 4.0, strength: 0 }
+		shadowColor: 0x000000, shadowAlpha: 1.0, blurX: 4.0, blurY: 4.0, strength: 0 }
 	
-	blur				object					BlurFilter
+	blur				Object					BlurFilter
 	  { blurX: 0.0, blurY: 0.0 }
 	
-	convolution			object					ConvolutionFilter
+	convolution			Object					ConvolutionFilter
 	  { divisor: 1.0, bias: 0.0, color: 0, alpha: 0.0 }
 	
-	displace			object					DisplacementMapFilter
+	displace			Object					DisplacementMapFilter
 	  { scaleX: 0.0, scaleY: 0.0, color: 0, alpha: 0.0 }
 	
-	dropShadow			object					DropShadowFilter
+	dropShadow			Object					DropShadowFilter
 	  { distance: 0.0, angle: 45, color: 0, alpha: 1.0, blurX: 0.0, blurY: 0.0, strength: 0 }
 	
-	glow				object					GlowFilter
+	glow				Object					GlowFilter
 	  { alpha: 1, blurX: 0.0, blurY: 0.0, strength: 0, color: 0 }
 	
-	hexColor			number					generic interpolated hex color value
-	backgroundColor		number					TextField.backgroundColor as hex value
-	borderColor			number					TextField.borderColor as hex value
-	textColor			number					TextField.textColor as hex value
-	text				string					simple text tween for TextField
+	text				String					simple text tween for TextField
+	hexColor			Number					generic interpolated hex color value
+	backgroundColor		Number					TextField.backgroundColor as hex value
+	borderColor			Number					TextField.borderColor as hex value
+	textColor			Number					TextField.textColor as hex value
 
 
 	TweenMan is Licensed under the MIT License

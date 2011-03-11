@@ -8,7 +8,7 @@ package com.tweenman.props
 		override public function init ():void
 		{
 			if (!(target is MovieClip)) { tween.typeError(id, "MovieClip"); return; }
-			start = target.currentFrame;
+			start = int(target.currentFrame);
 			if (typeof(value) == "number")
 			{
 				change = value - start;

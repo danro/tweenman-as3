@@ -4,12 +4,11 @@ package com.tweenman.props
 	{
 		override public function init ():void
 		{
-			start = target[id];
 		}
 		
 		override public function update ($position:Number):void
 		{
-			target[id] = value.substr(0, Math.round($position * value.length));
+			target[id] = this.value.substr(0, Math.round($position * this.value.length));
 		}
 	}
 }

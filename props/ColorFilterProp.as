@@ -59,7 +59,7 @@ package com.tweenman.props
 			{
 				if (filters[i] is ColorMatrixFilter)
 				{
-					filters[i].matrix = current.concat();
+					ColorMatrixFilter(filters[i]).matrix = current.concat();
 					target.filters = filters;
 					return;
 				}

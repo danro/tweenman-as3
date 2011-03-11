@@ -19,11 +19,11 @@ package com.tweenman
 			displace: 				DisplaceProp,
 			dropShadow: 			DropShadowProp,
 			glow: 					GlowFilterProp,
+			text: 					TextProp,
+			hexColor: 				HexColorProp,
 			backgroundColor: 		HexColorProp,
 			borderColor: 			HexColorProp,
 			textColor: 				HexColorProp,
-			hexColor: 				HexColorProp,
-			text: 					TextProp,
 			array: 					ArrayProp
 		};
 		
