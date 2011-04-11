@@ -24,23 +24,23 @@
 	import com.tweenman.TweenMan;
 
 	// time-based alpha tween
-	TweenMan.addTween(target, { time: 1, alpha: 0, ease: "easeInOutExpo" });
+	TweenMan.add(target, { time: 1, alpha: 0, ease: "easeInOutExpo" });
 
 	// frame-based scrollRect tween
-	TweenMan.addTween(target, { frames: 50, rectangle: [0,0,100,100], ease: "easeOutBack" });
+	TweenMan.add(target, { frames: 50, rectangle: [0,0,100,100], ease: "easeOutBack" });
 
 	// time-based ColorMatrixFilter tween
-	TweenMan.addTween(target, { time: 2, colorMatrix: { saturation: 0, contrast: 2 } });
+	TweenMan.add(target, { time: 2, colorMatrix: { saturation: 0, contrast: 2 } });
 
 	// tween an array
 	var myArray:Array = [1, 4, 5, 6];
-	TweenMan.addTween(myArray, { time: 1, array: [0, 3, 4, 4] });
+	TweenMan.add(myArray, { time: 1, array: [0, 3, 4, 4] });
 
 	// remove tweens by property
-	TweenMan.removeTweens(target, "alpha", "rectangle", "color");
+	TweenMan.remove(target, "alpha", "rectangle", "color");
 
 	// remove all tweens on target
-	TweenMan.removeTweens(target);
+	TweenMan.remove(target);
 
 	// see if a tween is active
 	TweenMan.isTweening(target, "color");
@@ -168,6 +168,7 @@ package com.tweenman
 			initialized = true;
 		}
 		
+		public static var add:Function = addTween;
 		public static function addTween ($target:Object, $vars:Object):void
 		{
 			if (!initialized) new TweenMan;
@@ -198,6 +199,7 @@ package com.tweenman
 			tween.init($target, $vars, tweenID);
 		}
 		
+		public static var remove:Function = removeTweens;
 		public static function removeTweens ($target:Object, ...$props:Array):void
 		{
 			if (!initialized || $target == null || tweenDict[$target] == null) return;
